@@ -1,3 +1,11 @@
+# Project output
+out/*
+!out/example_mosaic.png
+src/test_*
+
+#  IDE
+.vscode/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
