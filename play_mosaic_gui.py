@@ -1,3 +1,5 @@
+from random import randint
+import time
 from tkinter import Tk
 from src.mosaic_gui import MosaicGUI
 from src.mosaic_image import Mosaic
@@ -51,6 +53,19 @@ class Listener:
     def check_is_win(self):
         if self.mosaic.check_is_win():
             self.gui.display_victory()
+            return True
+
+        return False
+
+    def autoplay(self):
+        # FIXME image doesnt update, maybe fork ?
+        rows = self.gui.get_rows() - 1
+        cols = self.gui.get_cols() - 1
+        while not self.check_is_win():
+            next_click_row = randint(0, rows)
+            next_click_col = randint(0, cols)
+            self.click_on_image(next_click_row, next_click_col)
+            time.sleep(1)
 
 
 # Create application

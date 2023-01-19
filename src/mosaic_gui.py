@@ -36,6 +36,13 @@ class MosaicGUI:
         )
         shuffle_button.grid(column=1, row=3)
 
+        # Create auto play elements
+        autoplay_button = ttk.Button(
+            self.mainframe, text="Autoplay", command=self.autoplay
+        )
+        autoplay_button.grid(column=3, row=3)
+
+        # Create canvas
         self.canvas = Canvas(
             self.mainframe,
         )
@@ -79,6 +86,9 @@ class MosaicGUI:
         )
         print(f"clicked at {event.x}, {event.y} -> (row[{row}] col[{col}])")
         self.listener.click_on_image(row, col)
+
+    def autoplay(self, *args):
+        self.listener.autoplay()
 
     def highlight_region(self, row, col):
         print(f"Higlighting {row},{col}")
