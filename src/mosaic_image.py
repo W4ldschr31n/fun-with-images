@@ -52,6 +52,14 @@ class Region:
 class Mosaic:
     def __init__(self, out_path: str = "../out"):
         self.out_path = out_path
+        self.width = None
+        self.height = None
+        self.cols = None
+        self.rows = None
+        self.col_step = None
+        self.row_step = None
+        self.boxes = []
+        self.regions: List[Region] = []
 
     def init_from_image(self, im: Image, cols, rows):
         self.width = im.width
@@ -67,8 +75,8 @@ class Mosaic:
         self._set_regions(im)
 
     def _set_boxes(self):
-        for x in range(self.cols):
-            for y in range(self.rows):
+        for y in range(self.cols):
+            for x in range(self.rows):
                 self.boxes.append(
                     (
                         x * self.col_step,
@@ -126,12 +134,17 @@ class Mosaic:
     def check_is_win(self):
         return all(region.check_is_ok() for region in self.regions)
 
-    def swap_regions(self, pos_1: int, pos_2: int):
+    def swap_regions_from_index(self, index_1: int, index_2: int):
         check_range = range(len(self.regions))
         # Check the move is legit
-        if pos_1 not in check_range or pos_2 not in check_range:
+        if index_1 not in check_range or index_2 not in check_range:
             raise ValueError("Position to move is out of bounds")
-        self.regions[pos_1].swap_with(self.regions[pos_2])
+        self.regions[index_1].swap_with(self.regions[index_2])
+
+    def swap_regions_from_pos(self, pos_1: Tuple[int, int], pos_2: int):
+        index_1 = pos_1[0] + pos_1[1] * self.cols
+        index_2 = pos_2[0] + pos_2[1] * self.cols
+        self.swap_regions_from_index(index_1, index_2)
 
     def get_all_current_hash(self):
         return [region.get_current_hash() for region in self.regions]
@@ -145,9 +158,9 @@ class Mosaic:
             print("------")
             logging.debug(self.get_all_original_hash())
             logging.debug(self.get_all_current_hash())
-            pos_1, pos_2 = int(input("First pos to swap : ")), int(
-                input("Second pos to swap : ")
+            index_1, index_2 = int(input("First index to swap : ")), int(
+                input("Second index to swap : ")
             )
-            self.swap_regions(pos_1, pos_2)
+            self.swap_regions_from_index(index_1, index_2)
             self.save_assembled()
         print("WIN")

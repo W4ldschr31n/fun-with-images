@@ -9,6 +9,7 @@ class MosaicGUI:
         root.title("Play mosaic!")
         self.listener = listener
         self.base_image_path = base_image_path
+        self.boxes = []
 
         # Create main frame
         self.mainframe = ttk.Frame(root, padding="3 3 12 12")
@@ -35,15 +36,12 @@ class MosaicGUI:
         )
         shuffle_button.grid(column=1, row=3)
 
-        self.base_image = PhotoImage(file=base_image_path)
         self.canvas = Canvas(
             self.mainframe,
-            width=500,
-            height=500,
         )
         self.canvas.grid(column=1, row=4)
-        self.canvas.create_image(0, 0, anchor=NW, image=self.base_image)
-        self.canvas.image = self.base_image
+        self.set_image(base_image_path)
+        self.canvas.bind("<Button-1>", self.click_on_image)
 
         # Conveniency
         for child in self.mainframe.winfo_children():
@@ -63,8 +61,36 @@ class MosaicGUI:
 
     def set_image(self, filepath):
         self.base_image = PhotoImage(file=filepath)
-        new_im = self.canvas.create_image(0, 0, anchor=NW, image=self.base_image)
+        self.canvas.configure(
+            width=self.base_image.width(), height=self.base_image.height()
+        )
+        self.canvas.create_image(0, 0, anchor=NW, image=self.base_image)
         self.canvas.image = self.base_image
+
+    def set_boxes(self, boxes):
+        self.boxes = boxes
+
+    def click_on_image(self, event):
+        row = min(
+            int(event.x / self.base_image.width() * self.get_rows()), self.get_rows()
+        )
+        col = min(
+            int(event.y / self.base_image.height() * self.get_cols()), self.get_cols()
+        )
+        print(f"clicked at {event.x}, {event.y} -> (row[{row}] col[{col}])")
+        self.listener.click_on_image(row, col)
+
+    def highlight_region(self, row, col):
+        print(f"Higlighting {row},{col}")
+
+    def unlight_region(self, row, col):
+        print(f"Unlighting {row},{col}")
+
+    def swap_regions(self, region_1, region_2):
+        print(f"Swapping {region_1},{region_2}")
+
+    def display_victory(self):
+        print(f"Wouhou !")
 
 
 if __name__ == "__main__":

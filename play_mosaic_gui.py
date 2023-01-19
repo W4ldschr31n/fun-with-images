@@ -10,12 +10,17 @@ class Listener:
         self.gui: MosaicGUI = None
         self.mosaic: Mosaic = None
         self.image_path = image_path
+        self.current_region_clicked = None
 
     def set_gui(self, gui):
         self.gui = gui
 
     def set_mosaic(self, mosaic):
         self.mosaic = mosaic
+
+    def display_mosaic_output(self):
+        self.mosaic.save_assembled()
+        self.gui.set_image("./out/mosaic.png")
 
     def shuffle(self):
         with Image.open(self.image_path) as im:
@@ -25,8 +30,27 @@ class Listener:
                 self.gui.get_cols(),
             )
             self.mosaic.shuffle_regions()
-            self.mosaic.save_assembled()
-        self.gui.set_image("./out/mosaic.png")
+            self.display_mosaic_output()
+
+    def click_on_image(self, row, col):
+        new_pos = (row, col)
+        if self.current_region_clicked is None:
+            self.gui.highlight_region(row, col)
+            self.current_region_clicked = new_pos
+        else:
+            if self.current_region_clicked == new_pos:
+                self.gui.unlight_region(row, col)
+            else:
+                self.gui.swap_regions(self.current_region_clicked, new_pos)
+                self.mosaic.swap_regions_from_pos(self.current_region_clicked, new_pos)
+                self.display_mosaic_output()
+                self.check_is_win()
+
+            self.current_region_clicked = None
+
+    def check_is_win(self):
+        if self.mosaic.check_is_win():
+            self.gui.display_victory()
 
 
 # Create application
